@@ -194,7 +194,13 @@ void print_arp(arp_packet_t *arp)
     printf("\tptype:\t0x%04x\n", arp->arp_hdr.ptype);
     printf("\thlen:\t%u\n", arp->arp_hdr.hlen);
     printf("\tplen:\t%u\n", arp->arp_hdr.plen);
-    printf("\top:\t%u (ARP REQUEST)\n", arp->arp_hdr.op);
+    
+    if (arp->arp_hdr.op == 1) {
+        printf("\top:\t%u (ARP REQUEST)\n", arp->arp_hdr.op);
+    }
+    else {
+        printf("\top:\t%u (ARP RESPONSE)\n", arp->arp_hdr.op);
+    }
 
     printf("\tspa:\t%s\n", spa);
     printf("\tsha:\t%s\n", sha);
