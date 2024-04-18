@@ -174,6 +174,21 @@ void print_arp(arp_packet_t *arp)
          tpa:       192.168.50.99
          tha:       00:00:00:00:00:00
      */
+    char sha[18], tha[18];
+    char spa[16], tpa[16];
+
+    if (mac_toStr(arp->arp_hdr.sha, sha, sizeof(sha)) < 0 || mac_toStr(arp->arp_hdr.tha, tha, sizeof(tha)) < 0)
+    {
+        printf("Error (Hardware address)\n");
+        return;
+    };
+
+    if (ip_toStr(arp->arp_hdr.spa, spa, sizeof(spa)) < 0 || ip_toStr(arp->arp_hdr.tpa, tpa, sizeof(tpa)) < 0)
+    {
+        printf("Error (IP Address)\n");
+        return;
+    };
+
     printf("ARP PACKET DETAILS\n");
     printf("\thtype:\t0x%04x\n", arp->arp_hdr.htype);
     printf("\tptype:\t0x%04x\n", arp->arp_hdr.ptype);
@@ -181,10 +196,11 @@ void print_arp(arp_packet_t *arp)
     printf("\tplen:\t%u\n", arp->arp_hdr.plen);
     printf("\top:\t%u (ARP REQUEST)\n", arp->arp_hdr.op);
 
-    printf("\tspa:\n");
-    printf("\tsha:\t\n");
-    printf("\ttha:\t\n");
-    printf("\ttpa:\t\n");
+    printf("\tspa:\t%s\n", spa);
+    printf("\tsha:\t%s\n", sha);
+
+    printf("\ttpa:\t%s\n", tpa);
+    printf("\ttha:\t%s\n", tha);
 }
 
 /********************************************************************************/
