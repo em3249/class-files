@@ -18,8 +18,9 @@
 // the packet length, which will be helpful later.
 test_packet_t TEST_CASES[] = {
     // MAKE_PACKET(raw_packet_icmp_frame198),
-    // MAKE_PACKET(raw_packet_icmp_frame362),
-    MAKE_PACKET(raw_packet_arp_frame78)};
+    MAKE_PACKET(raw_packet_icmp_frame362),
+    // MAKE_PACKET(raw_packet_arp_frame78)
+    };
 
 // !!!!!!!!!!!!!!!!!!!!! WHAT YOU NEED TO DO !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 //
@@ -147,6 +148,8 @@ arp_packet_t *process_arp(raw_packet_t raw_packet)
     pack->arp_hdr.ptype = ntohs(pack->arp_hdr.ptype);
 
     pack->arp_hdr.op = htons(pack->arp_hdr.op);
+
+    return pack;
 }
 
 /*
@@ -228,7 +231,9 @@ bool check_ip_for_icmp(ip_packet_t *ip)
 
     // remove this after you implement the logic, just here to make sure
     // the program compiles
-    return false;
+    if(ip->ip_hdr.protocol == 1) {
+        return true;
+    };
 }
 
 /*
@@ -248,7 +253,17 @@ icmp_packet_t *process_icmp(ip_packet_t *ip)
 
     // remove this after you implement the logic, just here to make sure
     // the program compiles
-    return (icmp_packet_t *)ip;
+    // return (icmp_packet_t *)ip;
+
+    icmp_packet_t *pack = (icmp_packet_t *) ip;
+
+    pack->ip.ip_hdr.total_length = ntohs(pack->ip.ip_hdr.total_length);
+    pack->ip.ip_hdr.identification = ntohs(pack->ip.ip_hdr.identification);
+    pack->ip.ip_hdr.header_checksum = ntohs(pack->ip.ip_hdr.header_checksum);
+
+    pack->icmp_hdr.checksum = ntohs(pack->icmp_hdr.checksum);
+
+    return pack;
 }
 
 /*
@@ -267,6 +282,9 @@ bool is_icmp_echo(icmp_packet_t *icmp)
 
     // remove this after you implement the logic, just here to make sure
     // the program compiles
+    if(icmp->icmp_hdr.type == 8 || icmp->icmp_hdr.type == 0) {
+        return true;
+    };
     return false;
 }
 
@@ -286,7 +304,13 @@ icmp_echo_packet_t *process_icmp_echo(icmp_packet_t *icmp)
 
     // remove this after you implement the logic, just here to make sure
     // the program compiles
-    return (icmp_echo_packet_t *)icmp;
+    // return (icmp_echo_packet_t *)icmp;
+
+    icmp_echo_packet_t *pack = (icmp_echo_packet_t *)icmp;
+
+    
+
+    return pack;
 }
 
 /*
@@ -320,7 +344,17 @@ void print_icmp_echo(icmp_echo_packet_t *icmp_packet)
      */
 
     // remove this, just a placeholder
-    printf("This is where you place your logic to print your ICMP echo PDU header\n");
+    // printf("This is where you place your logic to print your ICMP echo PDU header\n");
+
+    printf("ICMP PACKET DETAILS\n");
+
+    printf("\ttype:\t\t0x%02x\n", icmp_packet->icmp_echo_hdr.icmp_hdr.type);
+    printf("\tchecksum:\t0x%04x\n", icmp_packet->icmp_echo_hdr.icmp_hdr.checksum);
+    printf("\tid:\t\t0x%04x\n", icmp_packet->ip.ip_hdr.identification);
+    printf("\tsequence:\t0x%04x\n", icmp_packet->icmp_echo_hdr.sequence);
+    printf("\ttimestamp:\t%s\n", "timestamp");
+    printf("\tpayload:\t%d bytes\n", 0);
+    printf("\tECHO Timestamp:\t%s\n", "time");
 
     // after you print the echo header, print the payload.
 
@@ -370,7 +404,7 @@ void print_icmp_payload(uint8_t *payload, uint16_t payload_size)
     // nice.  I provided the alogorithm for how I printed the above out
     // in the function header.
 
-    printf("delete this, but this is where your output goes\n");
+    printf("\n");
     printf("This is how to print a hex 5 nicely: %02x\n", 5);
     printf("This is how to print a long value of 20000 nicely: %04lx\n", 2000l);
 }
