@@ -19,7 +19,15 @@
 test_packet_t TEST_CASES[] = {
     MAKE_PACKET(raw_packet_icmp_frame198),
     MAKE_PACKET(raw_packet_icmp_frame362),
-    MAKE_PACKET(raw_packet_arp_frame78)};
+    MAKE_PACKET(raw_packet_arp_frame78)
+};
+
+// !!!!!!!!!!!!!!!!!!!!! WHAT YOU NEED TO DO !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//
+// Search the code for TODO:, each one of these describes a place where
+// you need to write code.  This scaffold should compile as is.  Make sure
+// you delete the TODO: documentation in your implementation and provide
+// some documentation on what you actually accomplished.
 
 int main(int argc, char **argv)
 {
@@ -123,6 +131,17 @@ void decode_raw_packet(uint8_t *packet, uint64_t packet_len)
  */
 arp_packet_t *process_arp(raw_packet_t raw_packet)
 {
+
+    // TODO: Implement this function.  Convert raw_packet via
+    // type conversion to arp_packet_t and then convert the
+    // network byte order fields to host byte order fields using
+    // ntohs() and/or ntohl().  Return a pointer to an arp_packet_t
+    // You do not need to allocate any memory.
+
+    // remove this after you implement the logic, just here to make sure
+    // the program compiles
+    // return (arp_packet_t *)raw_packet;
+
     arp_packet_t *pack = (arp_packet_t *)raw_packet;
 
     pack->arp_hdr.htype = ntohs(pack->arp_hdr.htype);
@@ -140,6 +159,9 @@ arp_packet_t *process_arp(raw_packet_t raw_packet)
  */
 void print_arp(arp_packet_t *arp)
 {
+    // TODO:  take the arp parameter, of type arp_packet_t and print it out
+    // nicely.  My output looks like below, but you dont have to make it look
+    // exactly like this, just something nice.
     /*
     Packet length = 60 bytes
     Detected raw frame type from ethernet header: 0x806
@@ -204,6 +226,13 @@ void print_arp(arp_packet_t *arp)
  */
 bool check_ip_for_icmp(ip_packet_t *ip)
 {
+    // TODO:  This function inspects the provided IP packet and extracts
+    // the protocol.  If the protocol is ICMP_PTYPE then we return true
+    // otherwise we return false.  The function header gives some more
+    // hints.
+
+    // remove this after you implement the logic, just here to make sure
+    // the program compiles
     if (ip->ip_hdr.protocol == 1)
     {
         return true;
@@ -219,6 +248,16 @@ bool check_ip_for_icmp(ip_packet_t *ip)
  */
 icmp_packet_t *process_icmp(ip_packet_t *ip)
 {
+    // TODO: Implement this function.  Convert ip_packet via
+    // type conversion to icmp_packet_t and then convert the
+    // network byte order fields to host byte order fields using
+    // ntohs() and/or ntohl().  Return a pointer to an icmp_packet_t
+    // You do not need to allocate any memory.
+
+    // remove this after you implement the logic, just here to make sure
+    // the program compiles
+    // return (icmp_packet_t *)ip;
+
     icmp_packet_t *pack = (icmp_packet_t *)ip;
 
     pack->icmp_hdr.checksum = ntohs(pack->icmp_hdr.checksum);
@@ -234,6 +273,15 @@ icmp_packet_t *process_icmp(ip_packet_t *ip)
  */
 bool is_icmp_echo(icmp_packet_t *icmp)
 {
+    // TODO:  This function inspects the provided ICMP and checks
+    // its type.  If the type is ICMP_ECHO_REQUEST or ICMP_ECHO_RESPONSE
+    // then reutrn true otherwise we return false.  The function header
+    // gives some more hints.  The constants are defined in packet.h so take
+    // a look there as well.
+
+    // remove this after you implement the logic, just here to make sure
+    // the program compiles
+
     printf("ICMP Type %d\n", icmp->icmp_hdr.type);
 
     if (icmp->icmp_hdr.type == 8 || icmp->icmp_hdr.type == 0)
@@ -251,6 +299,16 @@ bool is_icmp_echo(icmp_packet_t *icmp)
  */
 icmp_echo_packet_t *process_icmp_echo(icmp_packet_t *icmp)
 {
+    // TODO: Implement this function.  Convert icmp_packet_t via
+    // type conversion to icmp_echo_packet_t and then convert the
+    // network byte order fields to host byte order fields using
+    // ntohs() and/or ntohl().  Return a pointer to an icmp_echo_packet_t
+    // You do not need to allocate any memory.
+
+    // remove this after you implement the logic, just here to make sure
+    // the program compiles
+    // return (icmp_echo_packet_t *)icmp;
+
     icmp_echo_packet_t *pack = (icmp_echo_packet_t *)icmp;
 
     pack->icmp_echo_hdr.id = ntohs(pack->icmp_echo_hdr.id);
@@ -274,6 +332,9 @@ icmp_echo_packet_t *process_icmp_echo(icmp_packet_t *icmp)
  */
 void print_icmp_echo(icmp_echo_packet_t *icmp_packet)
 {
+    // TODO:  take the icmp_packet parameter, of type icmp_echo_packet_t
+    // and print it out nicely.  My output looks like below, but you dont
+    // have to make it look exactly like this, just something nice.
     /*
     Packet length = 98 bytes
     Detected raw frame type from ethernet header: 0x800
@@ -289,6 +350,9 @@ void print_icmp_echo(icmp_echo_packet_t *icmp_packet)
          ECHO Timestamp: TS = 2023-09-22 21:06:54.57804
      */
 
+    // remove this, just a placeholder
+    // printf("This is where you place your logic to print your ICMP echo PDU header\n");
+
     printf("ICMP PACKET DETAILS\n");
 
     printf("\ttype:\t\t0x%02x\n", icmp_packet->icmp_echo_hdr.icmp_hdr.type);
@@ -302,9 +366,9 @@ void print_icmp_echo(icmp_echo_packet_t *icmp_packet)
     // correctly.  You can thank me later.
     uint16_t payload_size = ICMP_Payload_Size(icmp_packet);
 
-    printf("\ttimestamp:\t0x%x%x\n", icmp_packet->icmp_echo_hdr.timestamp, icmp_packet->icmp_echo_hdr.timestamp_ms);
+    printf("\ttimestamp:\t0x%x%x\n", icmp_packet->icmp_echo_hdr.timestamp , icmp_packet->icmp_echo_hdr.timestamp_ms);
     printf("\tpayload:\t%d bytes\n", payload_size);
-    printf("\tEcho Timestamp:\t%s\n", get_ts_formatted(icmp_packet->icmp_echo_hdr.timestamp, icmp_packet->icmp_echo_hdr.timestamp_ms));
+    printf("\tEcho Timestamp:\t%s\n", get_ts_formatted(icmp_packet->icmp_echo_hdr.timestamp , icmp_packet->icmp_echo_hdr.timestamp_ms));
 
     // Now print the payload data
     print_icmp_payload(icmp_packet->icmp_payload, payload_size);
@@ -341,6 +405,12 @@ void print_icmp_echo(icmp_echo_packet_t *icmp_packet)
  */
 void print_icmp_payload(uint8_t *payload, uint16_t payload_size)
 {
+    // TODO:  this function takes the payload which is just basically an
+    // array of bytes and prints it out nicely.  My output is shown in the
+    // function header, you can alter your output just make sure it looks
+    // nice.  I provided the alogorithm for how I printed the above out
+    // in the function header.
+
     int i;
     int line_length = 8;
 
