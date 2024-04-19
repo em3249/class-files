@@ -11,15 +11,25 @@
 // Before you do your own, please test with the ones that I provided as samples:
 #include "testframes.h"
 
+#include "myframes.h"
+
 // You can update this array as you add and remove test cases, you can
 // also comment out all but one of them to isolate your testing. This
 // allows us to loop over all of the test cases.  Note MAKE_PACKET creates
 // a test_packet_t element for each sample, this allows us to get and use
 // the packet length, which will be helpful later.
 test_packet_t TEST_CASES[] = {
-    MAKE_PACKET(raw_packet_icmp_frame198),
-    MAKE_PACKET(raw_packet_icmp_frame362),
-    MAKE_PACKET(raw_packet_arp_frame78)};
+    //MAKE_PACKET(raw_packet_icmp_frame198),
+    //MAKE_PACKET(raw_packet_icmp_frame362),
+    //MAKE_PACKET(raw_packet_arp_frame78)
+
+    MAKE_PACKET(pkt587),
+    MAKE_PACKET(pkt1176),
+    MAKE_PACKET(pkt71932),
+    MAKE_PACKET(pkt11732),
+    MAKE_PACKET(pkt11733),
+    MAKE_PACKET(pkt71223)
+    };
 
 int main(int argc, char **argv)
 {
@@ -182,7 +192,7 @@ void print_arp(arp_packet_t *arp)
     }
     else
     {
-        printf("\top:\t%u (ARP RESPONSE)\n", arp->arp_hdr.op);
+        printf("\top:\t%u (ARP REPLY)\n", arp->arp_hdr.op);
     }
 
     printf("\tspa:\t%s\n", spa);
