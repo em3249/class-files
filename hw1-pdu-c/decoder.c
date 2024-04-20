@@ -19,16 +19,14 @@
 // a test_packet_t element for each sample, this allows us to get and use
 // the packet length, which will be helpful later.
 test_packet_t TEST_CASES[] = {
-    //MAKE_PACKET(raw_packet_icmp_frame198),
-    //MAKE_PACKET(raw_packet_icmp_frame362),
-    //MAKE_PACKET(raw_packet_arp_frame78)
+    MAKE_PACKET(raw_packet_icmp_frame198),
+    MAKE_PACKET(raw_packet_icmp_frame362),
+    MAKE_PACKET(raw_packet_arp_frame78),
 
-    MAKE_PACKET(pkt587),
-    MAKE_PACKET(pkt1176),
-    MAKE_PACKET(pkt71932),
-    MAKE_PACKET(pkt11732),
-    MAKE_PACKET(pkt11733),
-    MAKE_PACKET(pkt71223)
+    MAKE_PACKET(pkt18027),
+    MAKE_PACKET(pkt19299),
+    MAKE_PACKET(pkt19573),
+    MAKE_PACKET(pkt19574)
     };
 
 int main(int argc, char **argv)
