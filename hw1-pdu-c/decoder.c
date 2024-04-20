@@ -216,6 +216,7 @@ bool check_ip_for_icmp(ip_packet_t *ip)
     {
         return true;
     };
+    return false;
 }
 
 /*
@@ -355,16 +356,16 @@ void print_icmp_payload(uint8_t *payload, uint16_t payload_size)
     printf("\nPAYLOAD\n\n");
 
     printf("Offset\t| Contents\n");
-    printf("----------------------------------\n");
+    printf("-------------------------------------------------\n");
 
     for (i = 0; i < 48; i++)
     {
         if ((i % line_length) == 0)
         {
-            printf("0x%04lx\t| ", i);
+            printf("0x%04x\t| ", i);
         }
 
-        printf("%02x ", payload[i]);
+        printf("0x%02x ", payload[i]);
 
         if ((i % line_length) == (line_length - 1))
         {
