@@ -16,13 +16,18 @@
 					],
 					"linkDirectories" : 
 					[
-						"/usr/local/lib"
+						"/usr/local/lib",
+						"/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib",
+						"/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib/swift"
 					],
-					"linkFrameworkDirectories" : [],
+					"linkFrameworkDirectories" : 
+					[
+						"/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks"
+					],
 					"linkLibraries" : []
 				},
 				"path" : "/usr/bin/clang",
-				"version" : "15.0.0.15000100"
+				"version" : "15.0.0.15000309"
 			},
 			"language" : "C",
 			"sourceFileExtensions" : 
@@ -46,16 +51,21 @@
 					],
 					"linkDirectories" : 
 					[
-						"/usr/local/lib"
+						"/usr/local/lib",
+						"/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib",
+						"/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib/swift"
 					],
-					"linkFrameworkDirectories" : [],
+					"linkFrameworkDirectories" : 
+					[
+						"/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks"
+					],
 					"linkLibraries" : 
 					[
 						"c++"
 					]
 				},
 				"path" : "/usr/bin/clang++",
-				"version" : "15.0.0.15000100"
+				"version" : "15.0.0.15000309"
 			},
 			"language" : "CXX",
 			"sourceFileExtensions" : 

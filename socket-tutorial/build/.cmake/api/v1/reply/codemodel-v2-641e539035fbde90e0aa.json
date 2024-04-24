@@ -76,12 +76,12 @@
 	"kind" : "codemodel",
 	"paths" : 
 	{
-		"build" : "/Users/bsm23/course-code/CS472-Class-Files/socket-tutorial/build",
-		"source" : "/Users/bsm23/course-code/CS472-Class-Files/socket-tutorial"
+		"build" : "/Users/eyasumessele/Documents/school/tux/allYears/fourthYear/sp24/cs472/class-files/socket-tutorial/build",
+		"source" : "/Users/eyasumessele/Documents/school/tux/allYears/fourthYear/sp24/cs472/class-files/socket-tutorial"
 	},
 	"version" : 
 	{
 		"major" : 2,
-		"minor" : 6
+		"minor" : 7
 	}
 }
