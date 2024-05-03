@@ -78,7 +78,10 @@ static void init_header(cs472_proto_header_t *header, int req_cmd, char *reqData
 
     // TODO: Setup other header fields, eg., header->ver, header->dir, header->atm, header->ay
 
-    //header->ver = PROTO_VER_1;
+    header->ver = PROTO_VER_1; // Set the protocol version to 1
+    header->dir = DIR_SEND;    // Set the direction to send
+    header->atm = TERM_SPRING; // Set the academic term to Fall (adjust as needed)
+    header->ay = 2024;
 
     // switch based on the command
     switch (req_cmd)
@@ -149,32 +152,29 @@ static void start_client(cs472_proto_header_t *header, uint8_t *packet)
      *      recv() - get the response back from the server
      */
 
-    ret = connect(data_socket, (const struct sockaddr *)&addr,
-                  sizeof(struct sockaddr_in));
+    // ret = connect(data_socket, (const struct sockaddr *)&addr, sizeof(struct sockaddr_in));
+    ret = connect(data_socket, (struct sockaddr *)&addr, sizeof(addr));
     if (ret == -1)
     {
         fprintf(stderr, "The server is down.\n");
         exit(EXIT_FAILURE);
     }
 
-    ret = send(data_socket, packet, strlen(packet), 0);
+    // ret = send(data_socket, packet, strlen(packet), 0);
+    ret = send(data_socket, header, sizeof(header), 0);
     if (ret == -1)
     {
         perror("header write error");
         exit(EXIT_FAILURE);
     }
 
-    // NOW READ RESPONSES BACK - 2 READS, HEADER AND DATA
+    // ret = recv(data_socket, recv_buffer, sizeof(recv_buffer), 0);
     ret = recv(data_socket, recv_buffer, sizeof(recv_buffer), 0);
     if (ret == -1)
     {
         perror("read error");
         exit(EXIT_FAILURE);
     }
-
-    printf("RECV FROM SERVER -> %s\n", recv_buffer);
-
-    close(data_socket);
 
     // Now process what the server sent, here is some helper code
     cs472_proto_header_t *pcktPointer = (cs472_proto_header_t *)recv_buffer;
