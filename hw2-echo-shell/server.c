@@ -56,7 +56,7 @@ static void process_requests(int listen_socket)
     char msg_out_buffer[MAX_MSG_BUFFER];
     int data_socket;
     course_item_t *details;
-    int ret;
+    int ret; 
 
     // again, not the best approach, need ctrl-c to exit
     while (1)
@@ -93,7 +93,7 @@ static void process_requests(int listen_socket)
          *
          */
 
-        ret = recv(data_socket, msg_in_buffer, sizeof(msg_in_buffer), 0);
+        ret = recv(data_socket, recv_buffer, sizeof(recv_buffer), 0);
         if (ret == -1)
         {
             perror("read error");
@@ -135,9 +135,9 @@ static void process_requests(int listen_socket)
          *        the data_socket for the next request.
          */
 
-        int buff_len = sprintf((char *)msg_out_buffer, "THANK YOU -> %s", msg_in_buffer);
+        // int buff_len = sprintf((char *)send_buffer, "THANK YOU -> %s", recv_buffer);
 
-        send(data_socket, msg_out_buffer, buff_len, 0);
+        send(data_socket, send_buffer, sizeof(send_buffer), 0);
         close(data_socket);
     }
 }
