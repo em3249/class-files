@@ -153,7 +153,7 @@ static void start_client(cs472_proto_header_t *header, uint8_t *packet)
      */
 
     // ret = connect(data_socket, (const struct sockaddr *)&addr, sizeof(struct sockaddr_in));
-    ret = connect(data_socket, (struct sockaddr *)&addr, sizeof(addr));
+    ret = connect(data_socket, (struct sockaddr *)&addr, sizeof(struct sockaddr_in));
     if (ret == -1)
     {
         fprintf(stderr, "The server is down.\n");
@@ -161,7 +161,7 @@ static void start_client(cs472_proto_header_t *header, uint8_t *packet)
     }
 
     // ret = send(data_socket, packet, strlen(packet), 0);
-    ret = send(data_socket, header, sizeof(header), 0);
+    ret = send(data_socket, packet, strlen(packet), 0);
     if (ret == -1)
     {
         perror("header write error");
