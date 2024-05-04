@@ -2,11 +2,4 @@
     "files.associations": {
         "unistd.h": "c"
     },
-    "makefile.launchConfigurations": [
-        {
-            "cwd": "/Users/eyasumessele/Documents/school/tux/allYears/fourthYear/sp24/cs472/class-files/hw2-echo-shell",
-            "binaryPath": "/Users/eyasumessele/Documents/school/tux/allYears/fourthYear/sp24/cs472/class-files/hw2-echo-shell/client",
-            "binaryArgs": []
-        }
-    ]
 }
