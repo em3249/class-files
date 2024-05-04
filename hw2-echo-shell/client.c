@@ -76,12 +76,11 @@ static void init_header(cs472_proto_header_t *header, int req_cmd, char *reqData
     header->proto = PROTO_CS_FUN;
     header->cmd = req_cmd;
 
-    // TODO: Setup other header fields, eg., header->ver, header->dir, header->atm, header->ay
-
+    // TODO: header fields
     header->ver = PROTO_VER_1; // Set the protocol version to 1
     header->dir = DIR_SEND;    // Set the direction to send
-    header->atm = TERM_SPRING; // Set the academic term to Fall (adjust as needed)
-    header->ay = 2024;
+    header->atm = TERM_SPRING; // Set the academic term to Spring
+    header->ay = 2024;         // Set the academic year to 2024
 
     // switch based on the command
     switch (req_cmd)
@@ -142,17 +141,9 @@ static void start_client(cs472_proto_header_t *header, uint8_t *packet)
     addr.sin_addr.s_addr = inet_addr("127.0.0.1");
     addr.sin_port = htons(PORT_NUM);
 
-    /*
-     * TODO:  The next things you need to do is to handle the cleint
-     * socket to send things to the server, basically make the following
-     * calls:
-     *
-     *      connect()
-     *      send() - recall that the formatted packet is passed in
-     *      recv() - get the response back from the server
-     */
+    // TODO:  connect/send/recv
 
-    // ret = connect(data_socket, (const struct sockaddr *)&addr, sizeof(struct sockaddr_in));
+    // CONNECT
     ret = connect(data_socket, (struct sockaddr *)&addr, sizeof(struct sockaddr_in));
     if (ret == -1)
     {
@@ -160,15 +151,15 @@ static void start_client(cs472_proto_header_t *header, uint8_t *packet)
         exit(EXIT_FAILURE);
     }
 
-    // ret = send(data_socket, packet, strlen(packet), 0);
-    ret = send(data_socket, packet, strlen(packet), 0);
+    // SEND
+    ret = send(data_socket, packet, header->len, 0);
     if (ret == -1)
     {
         perror("header write error");
         exit(EXIT_FAILURE);
     }
 
-    // ret = recv(data_socket, recv_buffer, sizeof(recv_buffer), 0);
+    // RECIEVE
     ret = recv(data_socket, recv_buffer, sizeof(recv_buffer), 0);
     if (ret == -1)
     {
