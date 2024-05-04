@@ -56,7 +56,7 @@ static void process_requests(int listen_socket)
     char msg_out_buffer[MAX_MSG_BUFFER];
     int data_socket;
     course_item_t *details;
-    int ret; 
+    int ret;
 
     // again, not the best approach, need ctrl-c to exit
     while (1)
@@ -78,21 +78,7 @@ static void process_requests(int listen_socket)
 
         printf("\t RECEIVED REQ...\n");
 
-        /*
-         * TODO:  Handle the rest of the loop, basically you need to:
-         *
-         *      call recv() to get the request from the client
-         *
-         *      Here is some helper code after you receive data from the client.  This
-         *      helps get setup to actually process the client request
-         *
-         *      cs472_proto_header_t *pcktPointer =  (cs472_proto_header_t *)recv_buffer;
-         *      uint8_t *msgPointer = NULL;
-         *      uint8_t msgLen = 0;
-         *      process_recv_packet(pcktPointer, recv_buffer, &msgPointer, &msgLen);
-         *
-         */
-
+        // TODO:  Handle the rest of the loop
         ret = recv(data_socket, recv_buffer, sizeof(recv_buffer), 0);
         if (ret == -1)
         {
@@ -129,14 +115,7 @@ static void process_requests(int listen_socket)
             continue;
         }
 
-        /*
-         * TODO:  Now that we have processed things, send the response back to the
-         *        client - hint - its in the send_buffer. also dont forget to close
-         *        the data_socket for the next request.
-         */
-
-        // int buff_len = sprintf((char *)send_buffer, "THANK YOU -> %s", recv_buffer);
-
+        // TODO: send the response back 
         send(data_socket, send_buffer, sizeof(send_buffer), 0);
         close(data_socket);
     }
