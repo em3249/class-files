@@ -113,7 +113,8 @@ int submit_request(int sock, const char *host, uint16_t port, char *resource)
         //----------------------------------------------------------------------------
 
         sock = reopen_socket(host, port);
-        if (sock < 0) {
+        if (sock < 0)
+        {
             return sock;
         }
 
@@ -158,7 +159,8 @@ int submit_request(int sock, const char *host, uint16_t port, char *resource)
     //          b. return -1 to exit this function
     //--------------------------------------------------------------------------------
     int header_len = get_http_header_len(recv_buff, bytes_recvd);
-    if (header_len < 0) {
+    if (header_len < 0)
+    {
         close(sock);
         return -1;
     }
@@ -202,7 +204,8 @@ int submit_request(int sock, const char *host, uint16_t port, char *resource)
         //      b. return -1 to indicate an error
         //-----------------------------------------------------------------------------
         bytes_recvd = recv(sock, recv_buff, sizeof(recv_buff), 0);
-        if (bytes_recvd < 0) {
+        if (bytes_recvd < 0)
+        {
             close(sock);
             return -1;
         }
@@ -273,5 +276,4 @@ int main(int argc, char *argv[])
     }
 
     server_disconnect(sock);
-
 }
