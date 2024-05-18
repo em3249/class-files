@@ -6,6 +6,8 @@
 #include <unistd.h>
 #include <string.h>
 
+#include <time.h>
+
 #define BUFF_SZ 1024
 #define MAX_REOPEN_TRIES 5
 
@@ -183,7 +185,10 @@ int submit_request(int sock, const char *host, uint16_t port, char *resource)
     // what the following 2 lines of code do to track the amount of data received
     // from the server
     //
-    // YOUR ANSWER:  <START-YOUR-RESPONSE-HERE>
+    // YOUR ANSWER:  The initial_data variable calculates the amount of data
+    // already received by subtracting the header length from the total bytes received.
+    // The bytes_remaining variable calculates the remaining data by subtracting initial_data 
+    // from the content length.
     //
     //--------------------------------------------------------------------------------
     int initial_data = bytes_recvd - header_len;
@@ -212,7 +217,7 @@ int submit_request(int sock, const char *host, uint16_t port, char *resource)
 
         // You can uncomment out the fprintf() calls below to see what is going on
 
-        fprintf(stdout, "%.*s", bytes_recvd, recv_buff);
+        // fprintf(stdout, "%.*s", bytes_recvd, recv_buff);
         total_bytes += bytes_recvd;
         // fprintf(stdout, "remaining %d, received %d\n", bytes_remaining, bytes_recvd);
         bytes_remaining -= bytes_recvd;
@@ -230,7 +235,8 @@ int submit_request(int sock, const char *host, uint16_t port, char *resource)
     // You dont have any code to change, but explain why this function, if it gets to this
     // point returns an active socket.
     //
-    // YOUR ANSWER:  <START-YOUR-RESPONSE-HERE>
+    // YOUR ANSWER: This function returns a socket that the can be reused for the next request. 
+    // This avoids repeatedly opening and closing sockets.
     //
     //--------------------------------------------------------------------------------
     return sock;
@@ -238,11 +244,14 @@ int submit_request(int sock, const char *host, uint16_t port, char *resource)
 
 int main(int argc, char *argv[])
 {
+    struct timespec start, end;
+    clock_gettime(CLOCK_REALTIME, &start);
+
     int sock;
 
     const char *host = DEFAULT_HOST;
     uint16_t port = DEFAULT_PORT;
-    char *resource = "/html";
+    char *resource = DEFAULT_PATH;
     int remaining_args = 0;
 
     // YOU DONT NEED TO DO ANYTHING OR MODIFY ANYTHING IN MAIN().  MAKE SURE YOU UNDERSTAND
@@ -276,4 +285,9 @@ int main(int argc, char *argv[])
     }
 
     server_disconnect(sock);
+
+    clock_gettime(CLOCK_REALTIME, &end);
+
+    double elapsed_time = (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec) / 1e9;
+    printf("Total runtime: %.9f seconds\n", elapsed_time);
 }

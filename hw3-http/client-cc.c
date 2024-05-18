@@ -6,6 +6,8 @@
 #include <unistd.h>
 #include <string.h>
 
+#include <time.h>
+
 #define BUFF_SZ 1024
 
 char recv_buff[BUFF_SZ];
@@ -89,6 +91,9 @@ int process_request(const char *host, uint16_t port, char *resource)
 
 int main(int argc, char *argv[])
 {
+    struct timespec start, end;
+    clock_gettime(CLOCK_REALTIME, &start);
+
     int sock;
 
     const char *host = DEFAULT_HOST;
@@ -123,4 +128,9 @@ int main(int argc, char *argv[])
             process_request(host, port, resource);
         }
     }
+
+    clock_gettime(CLOCK_REALTIME, &end);
+
+    double elapsed_time = (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec) / 1e9;
+    printf("Total runtime: %.9f seconds\n", elapsed_time);
 }
