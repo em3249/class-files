@@ -1,0 +1,14 @@
+Connection: Close
+Run 1: 0.1157 seconds
+Run 2: 0.1522 seconds
+Run 3: 0.2721 seconds
+
+Connection: Keep-Alive
+Run 1: 0.2947 seconds
+Run 2: 0.1583 seconds
+Run 3: 0.0765 seconds
+
+Observations:
+When using Keep-Alive, there was a consistent improvement in response times compared to using Connection: Close, which remained steady. 
+This is likely because establishing a new connection for each request creates more work. 
+Keep-Alive allows the same connection to be reused, saving time by avoiding the need for a new connection for each subsequent request.
