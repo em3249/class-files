@@ -176,7 +176,7 @@ int submit_request(int sock, const char *host, uint16_t port, char *resource)
     // cannot find a Content-Length header, its assumed as per the HTTP spec that ther
     // is no body, AKA, content_len is zero;
     //--------------------------------------------------------------------------------
-    int content_len = get_http_content_len(recv_buff, bytes_recvd);
+    int content_len = get_http_content_len(recv_buff, header_len);
 
     //--------------------------------------------------------------------------------
     // TODO:  Make sure you understand the calculations below
@@ -187,7 +187,7 @@ int submit_request(int sock, const char *host, uint16_t port, char *resource)
     //
     // YOUR ANSWER:  The initial_data variable calculates the amount of data
     // already received by subtracting the header length from the total bytes received.
-    // The bytes_remaining variable calculates the remaining data by subtracting initial_data 
+    // The bytes_remaining variable calculates the remaining data by subtracting initial_data
     // from the content length.
     //
     //--------------------------------------------------------------------------------
@@ -235,7 +235,7 @@ int submit_request(int sock, const char *host, uint16_t port, char *resource)
     // You dont have any code to change, but explain why this function, if it gets to this
     // point returns an active socket.
     //
-    // YOUR ANSWER: This function returns a socket that the can be reused for the next request. 
+    // YOUR ANSWER: This function returns a socket that the can be reused for the next request.
     // This avoids repeatedly opening and closing sockets.
     //
     //--------------------------------------------------------------------------------

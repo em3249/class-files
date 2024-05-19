@@ -38,6 +38,7 @@ int process_request(const char *host, uint16_t port, char *resource)
     int sock;
     int total_bytes, bytes_recvd;
     char *req;
+    int request_len;
 
     sock = socket_connect(host, port);
     if (sock < 0)
@@ -65,7 +66,7 @@ int process_request(const char *host, uint16_t port, char *resource)
 
     req = generate_cc_request(host, port, resource);
 
-    int request_len = strlen(req);
+    request_len = strlen(req);
     if (send(sock, req, request_len, 0) != request_len)
     {
         perror("send failed");
@@ -132,5 +133,5 @@ int main(int argc, char *argv[])
     clock_gettime(CLOCK_REALTIME, &end);
 
     double elapsed_time = (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec) / 1e9;
-    printf("Total runtime: %.9f seconds\n", elapsed_time);
+    printf("Total runtime: %.4f seconds\n", elapsed_time);
 }
