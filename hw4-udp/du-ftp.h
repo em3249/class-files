@@ -13,3 +13,20 @@ typedef struct prog_config{
     char    svr_ip_addr[16];
     char    file_name[128];
 } prog_config;
+
+#define FTP_PROTO_VER_1   1
+#define FTP_MT_INIT       1
+#define FTP_MT_DATA       2
+#define FTP_MT_END        4
+#define FTP_MT_ERROR      8
+#define FTP_MT_INIT_ACK   (FTP_MT_INIT | 16)
+#define FTP_MT_END_ACK    (FTP_MT_END | 16)
+
+typedef struct ftp_pdu {
+    int     proto_ver;
+    int     mtype;
+    int     seqnum;
+    int     data_sz;
+    char    file_name[FNAME_SZ];
+    int     err_code;
+} ftp_pdu;
