@@ -3,6 +3,9 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 
+#define DP_MT_SNDFRAG    (DP_MT_SND     | DP_MT_FRAGMENT)
+#define DP_MT_SNDFRAGACK (DP_MT_SNDACK | DP_MT_FRAGMENT)
+#define IS_MT_FRAGMENT(x) ((x & DP_MT_FRAGMENT) == DP_MT_FRAGMENT)
 
 struct dp_sock{
     socklen_t          len;

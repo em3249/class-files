@@ -118,19 +118,35 @@ dp_connp dpClientInit(char *addr, int port) {
 }
 
 
-int dprecv(dp_connp dp, void *buff, int buff_sz){
+int dprecv(dp_connp dp, void *buff, int buff_sz) {
+    int totalReceived = 0;
+    char *rPtr = buff;
 
-    dp_pdu *inPdu;
-    int rcvLen = dprecvdgram(dp, _dpBuffer, sizeof(_dpBuffer));
+    while (totalReceived < buff_sz) {
+        int amount_received = dprecvdgram(dp, _dpBuffer, sizeof(_dpBuffer));
+        if (amount_received < 0) {
+            return amount_received;  // Return error if receiving fails
+        }
 
-    if(rcvLen == DP_CONNECTION_CLOSED)
-        return DP_CONNECTION_CLOSED;
+        dp_pdu *pduPtr = (dp_pdu *)_dpBuffer;
+        char *dataPtr = _dpBuffer + sizeof(dp_pdu);
+        int dataSize = pduPtr->dgram_sz;
 
-    inPdu = (dp_pdu *)_dpBuffer;
-    if(rcvLen > sizeof(dp_pdu))
-        memcpy(buff, (_dpBuffer+sizeof(dp_pdu)), inPdu->dgram_sz);
+        if (totalReceived + dataSize > buff_sz) {
+            return DP_BUFF_OVERSIZED;  // Buffer overflow
+        }
 
-    return inPdu->dgram_sz;
+        memcpy(rPtr, dataPtr, dataSize);
+
+        rPtr += dataSize;
+        totalReceived += dataSize;
+
+        if (!IS_MT_FRAGMENT(pduPtr->mtype)) {
+            break;  // Exit loop if it's not a fragment
+        }
+    }
+
+    return totalReceived;  // Return the total size of data received
 }
 
 
@@ -244,18 +260,25 @@ static int dprecvraw(dp_connp dp, void *buff, int buff_sz){
     return bytes;
 }
 
-int dpsend(dp_connp dp, void *sbuff, int sbuff_sz){
+int dpsend(dp_connp dp, void *sbuff, int sbuff_sz) {
+    char *sptr = sbuff;
+    int totalToSend = sbuff_sz;
+    int amountSent;
 
+    while (totalToSend > 0) {
+        int chunkSize = totalToSend > DP_MAX_BUFF_SZ ? DP_MAX_BUFF_SZ : totalToSend;
+        amountSent = dpsenddgram(dp, sptr, chunkSize);
 
-    //For now, we will not be able to send larger than the biggest datagram
-    if(sbuff_sz > dpmaxdgram()) {
-        return DP_BUFF_UNDERSIZED;
+        if (amountSent < 0) {
+            return amountSent;  // Return error if sending fails
+        }
+
+        totalToSend -= amountSent;
+        sptr += amountSent;
     }
 
-    int sndSz = dpsenddgram(dp, sbuff, sbuff_sz);
-
-    return sndSz;
-}
+    return sbuff_sz;  // Return the total size of data sent
+}   
 
 static int dpsenddgram(dp_connp dp, void *sbuff, int sbuff_sz){
     int bytesOut = 0;
