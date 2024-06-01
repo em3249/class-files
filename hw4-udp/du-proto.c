@@ -370,7 +370,7 @@ static int dpsenddgram(dp_connp dp, void *sbuff, int sbuff_sz)
     int bytesIn = dprecvraw(dp, &inPdu, sizeof(dp_pdu));
     if ((bytesIn < sizeof(dp_pdu)) && (inPdu.mtype != DP_MT_SNDACK && inPdu.mtype != DP_MT_SNDFRAGACK))
     {
-        printf("Expected SND/ACK or SND/FRAG/ACK but got a different mtype %d\n", inPdu.mtype);
+        printf("Expected SND/ACK but got a different mtype %d\n", inPdu.mtype);
     }
 
     return bytesOut - sizeof(dp_pdu);

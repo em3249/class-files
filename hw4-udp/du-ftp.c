@@ -13,11 +13,23 @@ static char sbuffer[BUFF_SZ];
 static char rbuffer[BUFF_SZ];
 static char full_file_path[FNAME_SZ];
 
+/*
+ *  Helper function that processes the command line arguements.  Highlights
+ *  how to use a very useful utility called getopt, where you pass it a
+ *  format string and it does all of the hard work for you.  The arg
+ *  string basically states this program accepts a -p or -c flag, the
+ *  -p flag is for a "pong message", in other words the server echos
+ *  back what the client sends, and a -c message, the -c option takes
+ *  a course id, and the server looks up the course id and responds
+ *  with an appropriate message. 
+ */
 static int initParams(int argc, char *argv[], prog_config *cfg)
 {
     int option;
+    //setup defaults if no arguements are passed
     static char cmdBuffer[64] = {0};
 
+    //setup defaults if no arguements are passed
     cfg->prog_mode = PROG_MD_CLI;
     cfg->port_number = DEF_PORT_NO;
     strcpy(cfg->file_name, PROG_DEF_FNAME);
@@ -140,6 +152,9 @@ int main(int argc, char *argv[])
     dp_connp dpc;
     int rc;
 
+
+    //Process the parameters and init the header - look at the helpers
+    //in the cs472-pproto.c file
     cmd = initParams(argc, argv, &cfg);
 
     printf("MODE %d\n", cfg.prog_mode);
@@ -149,6 +164,7 @@ int main(int argc, char *argv[])
     switch (cmd)
     {
     case PROG_MD_CLI:
+    //by default client will look for files in the ./outfile directory
         snprintf(full_file_path, sizeof(full_file_path), "./outfile/%s", cfg.file_name);
         dpc = dpClientInit(cfg.svr_ip_addr, cfg.port_number);
         rc = dpconnect(dpc);
@@ -163,6 +179,7 @@ int main(int argc, char *argv[])
         break;
 
     case PROG_MD_SVR:
+    //by default server will look for files in the ./infile directory
         snprintf(full_file_path, sizeof(full_file_path), "./infile/%s", cfg.file_name);
         dpc = dpServerInit(cfg.port_number);
         rc = dplisten(dpc);
