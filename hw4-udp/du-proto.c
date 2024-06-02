@@ -126,45 +126,33 @@ dp_connp dpClientInit(char *addr, int port)
 
 int dprecv(dp_connp dp, void *buff, int buff_sz)
 {
-    int total_received = 0;
-    char *current_buff_pos = (char *)buff;
+    int totalReceived = 0;
+    char *rPtr = buff;
 
-    while (total_received < buff_sz)
+    do
     {
-        int result = dprecvdgram(dp, _dpBuffer, sizeof(_dpBuffer));
-
-        if (result == DP_CONNECTION_CLOSED)
-        {
+        int amount_received = dprecvdgram(dp, _dpBuffer, sizeof(_dpBuffer));
+        if (amount_received == DP_CONNECTION_CLOSED)
             return DP_CONNECTION_CLOSED;
-        }
 
-        if (result < 0)
-        {
-            return result;
-        }
+        dp_pdu *pduPtr = (dp_pdu *)_dpBuffer;
+        void *dataPtr = (_dpBuffer + sizeof(dp_pdu));
 
-        dp_pdu *inPdu = (dp_pdu *)_dpBuffer;
-
-        if (total_received + inPdu->dgram_sz > buff_sz)
-        {
+        if (totalReceived + pduPtr->dgram_sz > buff_sz)
             return DP_BUFF_OVERSIZED;
-        }
 
-        memcpy(current_buff_pos, _dpBuffer + sizeof(dp_pdu), inPdu->dgram_sz);
-        current_buff_pos += inPdu->dgram_sz;
-        total_received += inPdu->dgram_sz;
+        memcpy(rPtr, dataPtr, pduPtr->dgram_sz);
+        rPtr += pduPtr->dgram_sz;
+        totalReceived += pduPtr->dgram_sz;
 
-        if (IS_MT_FRAGMENT(inPdu->mtype))
+        if (IS_MT_FRAGMENT(pduPtr->mtype))
         {
-            dp->seqNum++;
+            // handle fragment
         }
-        else
-        {
-            break;
-        }
-    }
 
-    return total_received;
+    } while (IS_MT_FRAGMENT(((dp_pdu *)_dpBuffer)->mtype));
+
+    return totalReceived;
 }
 
 static int dprecvdgram(dp_connp dp, void *buff, int buff_sz)
@@ -173,36 +161,21 @@ static int dprecvdgram(dp_connp dp, void *buff, int buff_sz)
     int errCode = DP_NO_ERROR;
 
     if (buff_sz > DP_MAX_DGRAM_SZ)
-    {
         return DP_BUFF_OVERSIZED;
-    }
 
     bytesIn = dprecvraw(dp, buff, buff_sz);
 
-    // check for some sort of error and just return it
     if (bytesIn < sizeof(dp_pdu))
-    {
-        errCode = DP_ERROR_BAD_DGRAM;
-    }
+        return DP_ERROR_BAD_DGRAM;
 
     dp_pdu inPdu;
     memcpy(&inPdu, buff, sizeof(dp_pdu));
     if (inPdu.dgram_sz > buff_sz)
-    {
-        errCode = DP_BUFF_UNDERSIZED;
-    }
+        return DP_BUFF_UNDERSIZED;
 
-    // UDPATE SEQ NUMBER AND PREPARE ACK
     if (errCode == DP_NO_ERROR)
     {
-        if (inPdu.dgram_sz == 0)
-        {
-            dp->seqNum++;
-        }
-        else
-        {
-            dp->seqNum += inPdu.dgram_sz;
-        }
+        dp->seqNum += (inPdu.dgram_sz == 0) ? 1 : inPdu.dgram_sz;
     }
     else
     {
@@ -215,36 +188,26 @@ static int dprecvdgram(dp_connp dp, void *buff, int buff_sz)
     outPdu.seqnum = dp->seqNum;
     outPdu.err_num = errCode;
 
-    int actSndSz = 0;
-    // HANDLE ERROR SITUATION
     if (errCode != DP_NO_ERROR)
     {
         outPdu.mtype = DP_MT_ERROR;
-        actSndSz = dpsendraw(dp, &outPdu, sizeof(dp_pdu));
-        if (actSndSz != sizeof(dp_pdu))
-        {
-            return DP_ERROR_PROTOCOL;
-        }
+        dpsendraw(dp, &outPdu, sizeof(dp_pdu));
+        return DP_ERROR_PROTOCOL;
     }
 
     switch (inPdu.mtype)
     {
     case DP_MT_SND:
+        outPdu.mtype = DP_MT_SNDACK;
+        dpsendraw(dp, &outPdu, sizeof(dp_pdu));
+        break;
     case DP_MT_SNDFRAG:
-        outPdu.mtype = IS_MT_FRAGMENT(inPdu.mtype) ? DP_MT_SNDFRAGACK : DP_MT_SNDACK;
-        actSndSz = dpsendraw(dp, &outPdu, sizeof(dp_pdu));
-        if (actSndSz != sizeof(dp_pdu))
-        {
-            return DP_ERROR_PROTOCOL;
-        }
+        outPdu.mtype = DP_MT_SNDFRAGACK;
+        dpsendraw(dp, &outPdu, sizeof(dp_pdu));
         break;
     case DP_MT_CLOSE:
         outPdu.mtype = DP_MT_CLOSEACK;
-        actSndSz = dpsendraw(dp, &outPdu, sizeof(dp_pdu));
-        if (actSndSz != sizeof(dp_pdu))
-        {
-            return DP_ERROR_PROTOCOL;
-        }
+        dpsendraw(dp, &outPdu, sizeof(dp_pdu));
         dpclose(dp);
         return DP_CONNECTION_CLOSED;
     default:
@@ -296,46 +259,36 @@ static int dprecvraw(dp_connp dp, void *buff, int buff_sz)
 
 int dpsend(dp_connp dp, void *sbuff, int sbuff_sz)
 {
-    if (sbuff_sz <= 0)
+    int totalToSend = sbuff_sz;
+    char *sptr = sbuff;
+
+    while (totalToSend > 0)
     {
-        return DP_ERROR_GENERAL;
+        int amountToSend = totalToSend > DP_MAX_BUFF_SZ ? DP_MAX_BUFF_SZ : totalToSend;
+        int sent = dpsenddgram(dp, sptr, amountToSend);
+        if (sent < 0)
+        {
+            return sent; // Handle error
+        }
+        totalToSend -= sent;
+        sptr += sent;
     }
 
-    int total_sent = 0;
-    int remaining_size = sbuff_sz;
-    char *current_buff_pos = (char *)sbuff;
-
-    while (remaining_size > 0)
-    {
-        int chunk_size = remaining_size > DP_MAX_BUFF_SZ ? DP_MAX_BUFF_SZ : remaining_size;
-        int result = dpsenddgram(dp, current_buff_pos, chunk_size);
-
-        if (result < 0)
-        {
-            return result;
-        }
-
-        total_sent += result;
-        current_buff_pos += chunk_size;
-        remaining_size -= chunk_size;
-
-        if (remaining_size > 0)
-        {
-            dp->seqNum++; // Increment sequence number for next fragment
-        }
-    }
-
-    return total_sent;
+    return sbuff_sz;
 }
 
 static int dpsenddgram(dp_connp dp, void *sbuff, int sbuff_sz)
 {
     int bytesOut = 0;
-
     if (!dp->outSockAddr.isAddrInit)
     {
         perror("dpsend:dp connection not setup properly");
         return DP_ERROR_GENERAL;
+    }
+
+    if (sbuff_sz > DP_MAX_BUFF_SZ)
+    {
+        return DP_BUFF_UNDERSIZED;
     }
 
     dp_pdu *outPdu = (dp_pdu *)_dpBuffer;
@@ -355,20 +308,14 @@ static int dpsenddgram(dp_connp dp, void *sbuff, int sbuff_sz)
         printf("Warning send %d, but expected %d!\n", bytesOut, totalSendSz);
     }
 
-    // update seq number after send
     if (outPdu->dgram_sz == 0)
-    {
         dp->seqNum++;
-    }
     else
-    {
         dp->seqNum += outPdu->dgram_sz;
-    }
 
-    // need to get an ack
     dp_pdu inPdu = {0};
     int bytesIn = dprecvraw(dp, &inPdu, sizeof(dp_pdu));
-    if ((bytesIn < sizeof(dp_pdu)) && (inPdu.mtype != DP_MT_SNDACK && inPdu.mtype != DP_MT_SNDFRAGACK))
+    if ((bytesIn < sizeof(dp_pdu)) && (inPdu.mtype != ((sbuff_sz > DP_MAX_BUFF_SZ) ? DP_MT_SNDFRAGACK : DP_MT_SNDACK)))
     {
         printf("Expected SND/ACK but got a different mtype %d\n", inPdu.mtype);
     }
@@ -571,6 +518,10 @@ static char *pdu_msg_to_string(dp_pdu *pdu)
         return "CONNECT/ACK";
     case DP_MT_CLOSEACK:
         return "CLOSE/ACK";
+    case DP_MT_SNDFRAG:
+        return "SEND/FRAGMENT";
+    case DP_MT_SNDFRAGACK:
+        return "SEND/FRAGMENT/ACK";
     default:
         return "***UNKNOWN***";
     }
