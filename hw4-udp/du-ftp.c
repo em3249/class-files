@@ -8,7 +8,7 @@
 #include "du-ftp.h"
 #include "du-proto.h"
 
-#define BUFF_SZ 1024
+#define BUFF_SZ 512
 static char sbuffer[BUFF_SZ];
 static char rbuffer[BUFF_SZ];
 static char full_file_path[FNAME_SZ];
@@ -111,7 +111,7 @@ int server_loop(dp_connp dpc, void *sBuff, void *rBuff, int sbuff_sz, int rbuff_
 
 void start_client(dp_connp dpc)
 {
-    static char sBuff[BUFF_SZ];
+    static char sBuff[500];
 
     if (!dpc->isConnected)
     {
