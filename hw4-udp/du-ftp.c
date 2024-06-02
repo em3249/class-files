@@ -8,7 +8,7 @@
 #include "du-ftp.h"
 #include "du-proto.h"
 
-#define BUFF_SZ 512
+#define BUFF_SZ 1024
 static char sbuffer[BUFF_SZ];
 static char rbuffer[BUFF_SZ];
 static char full_file_path[FNAME_SZ];
@@ -26,10 +26,10 @@ static char full_file_path[FNAME_SZ];
 static int initParams(int argc, char *argv[], prog_config *cfg)
 {
     int option;
-    //setup defaults if no arguements are passed
+    // setup defaults if no arguements are passed
     static char cmdBuffer[64] = {0};
 
-    //setup defaults if no arguements are passed
+    // setup defaults if no arguements are passed
     cfg->prog_mode = PROG_MD_CLI;
     cfg->port_number = DEF_PORT_NO;
     strcpy(cfg->file_name, PROG_DEF_FNAME);
@@ -111,7 +111,7 @@ int server_loop(dp_connp dpc, void *sBuff, void *rBuff, int sbuff_sz, int rbuff_
 
 void start_client(dp_connp dpc)
 {
-    static char sBuff[500];
+    static char sBuff[BUFF_SZ];
 
     if (!dpc->isConnected)
     {
@@ -152,9 +152,8 @@ int main(int argc, char *argv[])
     dp_connp dpc;
     int rc;
 
-
-    //Process the parameters and init the header - look at the helpers
-    //in the cs472-pproto.c file
+    // Process the parameters and init the header - look at the helpers
+    // in the cs472-pproto.c file
     cmd = initParams(argc, argv, &cfg);
 
     printf("MODE %d\n", cfg.prog_mode);
@@ -164,7 +163,7 @@ int main(int argc, char *argv[])
     switch (cmd)
     {
     case PROG_MD_CLI:
-    //by default client will look for files in the ./outfile directory
+        // by default client will look for files in the ./outfile directory
         snprintf(full_file_path, sizeof(full_file_path), "./outfile/%s", cfg.file_name);
         dpc = dpClientInit(cfg.svr_ip_addr, cfg.port_number);
         rc = dpconnect(dpc);
@@ -179,7 +178,7 @@ int main(int argc, char *argv[])
         break;
 
     case PROG_MD_SVR:
-    //by default server will look for files in the ./infile directory
+            // by default server will look for files in the ./infile directory
         snprintf(full_file_path, sizeof(full_file_path), "./infile/%s", cfg.file_name);
         dpc = dpServerInit(cfg.port_number);
         rc = dplisten(dpc);
